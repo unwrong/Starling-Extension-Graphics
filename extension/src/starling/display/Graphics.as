@@ -10,6 +10,7 @@ package starling.display
 	import starling.display.graphics.RoundedRectangle;
 	import starling.display.graphics.Stroke;
 	import starling.display.materials.IMaterial;
+	import starling.display.materials.Program3DCache;
 	import starling.display.shaders.fragment.TextureFragmentShader;
 	import starling.display.util.CurveUtil;
 	import starling.textures.Texture;
@@ -34,6 +35,7 @@ package starling.display
 		private var _strokeMaterial			:IMaterial;
 		
 		private var _container				:DisplayObjectContainer;
+		private var _strokeInterrupted		:Boolean;
 		
 		public function Graphics(displayObjectContainer:DisplayObjectContainer)
 		{
@@ -373,6 +375,29 @@ package starling.display
 			_currentY = y;
 		}
 		
+		// Degenerates allow for better performance as they do not terminate
+		// the vertex buffer but instead use zero size polygons to translate
+		// from the end point of the last sections of the stroke to the
+		// start of the new point.
+		public function moveToWithDegenerates(x:Number, y:Number):void
+		{
+			if ( _currentStroke && _strokeThickness > 0 )
+			{
+				_currentStroke.addDegenerates(x, y);
+			}
+			
+			if (_currentFill) 
+			{
+				_currentFill.addVertex( _currentX, _currentY );
+				_currentFill.addVertex( x, y );
+				_currentFill.addVertex( x, y );
+			}
+			
+			_currentX = x;
+			_currentY = y;
+			_strokeInterrupted = true;
+		}
+		
 		public function lineTo(x:Number, y:Number):void
 		{
 			if (!_currentStroke && _strokeThickness > 0) 
@@ -391,9 +416,10 @@ package starling.display
 				}
 			}
 			
-			if ( _currentStroke && _currentStroke.numVertices == 0 && isNaN(_currentX) == false )
+			if ( _currentStroke && ( _strokeInterrupted || _currentStroke.numVertices == 0 ) && isNaN(_currentX) == false )
 			{
 				_currentStroke.addVertex( _currentX, _currentY, _strokeThickness );
+				_strokeInterrupted  = false;
 			}
 			
 			if ( isNaN(_currentX) )
@@ -522,6 +548,17 @@ package starling.display
 				}
 				_currentStroke = null;
 			}
+		}
+		
+		// Specify either:
+		// 1) Off: Explicit flushing of non-referenced programs using flushNonReferencedPrograms()
+		// 2) On: Programs are flushed when there reference count reaches zero
+		public static function set autoDelete(on:Boolean):void {Program3DCache.autoDelete = on;}
+		public static function get autoDelete():Boolean {return Program3DCache.autoDelete;}
+		
+		public static function flushNonReferencedPrograms():void
+		{
+			Program3DCache.flushNonReferencedPrograms();
 		}
 	}
 }
