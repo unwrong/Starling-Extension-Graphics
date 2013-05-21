@@ -10,6 +10,7 @@ package starling.display
 	import starling.display.graphics.RoundedRectangle;
 	import starling.display.graphics.Stroke;
 	import starling.display.materials.IMaterial;
+	import starling.display.materials.Program3DCache;
 	import starling.display.shaders.fragment.TextureFragmentShader;
 	import starling.display.util.CurveUtil;
 	import starling.textures.Texture;
@@ -522,6 +523,17 @@ package starling.display
 				}
 				_currentStroke = null;
 			}
+		}
+		
+		// Specify either:
+		// 1) Off: Explicit flushing of non-referenced programs using flushNonReferencedPrograms()
+		// 2) On: Programs are flushed when there reference count reaches zero
+		public static function set autoDelete(on:Boolean):void {Program3DCache.autoDelete = on;}
+		public static function get autoDelete():Boolean {return Program3DCache.autoDelete;}
+		
+		public static function flushNonReferencedPrograms():void
+		{
+			Program3DCache.flushNonReferencedPrograms();
 		}
 	}
 }
