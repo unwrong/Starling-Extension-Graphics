@@ -71,7 +71,7 @@ package starling.display.graphicsEx
 		protected function handleGraphicsDataType(gfxData:flash.display.IGraphicsData ) : void
 		{
 			if ( gfxData is flash.display.GraphicsPath ) 
-				drawPath(flash.display.GraphicsPath(gfxData).commands, flash.display.GraphicsPath(gfxData).data, flash.display.GraphicsPath(gfxData).winding);
+				drawPath( (gfxData as flash.display.GraphicsPath).commands, (gfxData as flash.display.GraphicsPath).data, (gfxData as flash.display.GraphicsPath).winding);
 			else if ( gfxData is flash.display.GraphicsEndFill )
 				endFill();
 		//	else if ( gfxData is flash.display.GraphicsBitmapFill ) // TODO - With the righteous removal of GraphicsBitmapFill, how do we solve this? /IonSwitz
