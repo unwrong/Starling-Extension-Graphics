@@ -122,8 +122,8 @@ package starling.display
 			endFill();
 			
 			_fillStyleSet 	= true;
-			_fillColor 		= 0xFFFFFF;
-			_fillAlpha 		= 1;
+			_fillColor 		= material.color;
+			_fillAlpha 		= material.alpha;
 			_fillTexture 	= null;
 			_fillMaterial 	= material;
 			if ( uvMatrix )
